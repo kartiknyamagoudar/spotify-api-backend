@@ -11,6 +11,28 @@ app.use(express.json());
 let access_token = "";
 let refresh_token = "";
 
+async function refreshAccessToken() {
+  if (!refresh_token) return;
+  try {
+    const response = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refresh_token,
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        client_secret: process.env.SPOTIFY_CLIENT_SECRET,
+      })
+    );
+    access_token = response.data.access_token;
+    console.log("✅ Spotify access token refreshed");
+  } catch (error) {
+    console.error("Failed to refresh Spotify access token:", error);
+  }
+}
+
+setInterval(refreshAccessToken, 55 * 60 * 1000);
+
+
 // ✅ Root route just to test deployment
 app.get("/", (req, res) => {
   res.json({ message: "🎵 Spotify API is active" });

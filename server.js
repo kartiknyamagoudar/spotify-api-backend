@@ -102,20 +102,23 @@ app.get("/spotify", async (req, res) => {
     ]);
 
     res.json({
-      topTracks: tracks.data.items.map((t) => ({
+      top_tracks: tracks.data.items.map((t) => ({
         name: t.name,
-        artist: t.artists.map((a) => a.name).join(", "),
-        uri: t.uri,
+        artists: t.artists.map((a) => a.name),
       })),
-      nowPlaying: nowPlaying.data
+      now_playing: nowPlaying.data
         ? {
-            name: nowPlaying.data.item.name,
-            artist: nowPlaying.data.item.artists
-              .map((a) => a.name)
-              .join(", "),
+            is_playing: nowPlaying.data.is_playing,
+            item: {
+              name: nowPlaying.data.item.name,
+              artists: nowPlaying.data.item.artists,
+              album: nowPlaying.data.item.album,
+            },
           }
-        : "Nothing playing",
-      followedArtists: artists.data.artists.items.map((a) => a.name),
+        : { is_playing: false },
+      followed_artists: artists.data.artists.items.map((a) => ({
+        name: a.name,
+      })),
     });
   } catch (err) {
     console.error(err);
